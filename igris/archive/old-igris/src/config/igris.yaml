@@ -1,0 +1,99 @@
+# Commander Igris — Configuration
+# =================================
+
+igris:
+  version: "1.0.0"
+  loop_interval_s: 30
+  active_idle_threshold_s: 900  # 15 minutes
+
+hardware:
+  cpu: "AMD Ryzen 9 3950X"
+  ram_gb: 64
+  gpu: "NVIDIA GeForce RTX 3090"
+  gpu_vram_gb: 24
+  max_context_tokens: 65536  # 64k context — 50 GB KV-cache i RAM
+
+models:
+  main:
+    name: "qwen2.5-coder:32b"
+    quantization: "Q4_K_M (Ollama default)"
+    vram_allocated_gb: 19.0
+    engine: "ollama"
+    endpoint: "http://localhost:11434"
+
+  router:
+    name: "llama3.1:8b"
+    quantization: "Q4_K_M (Ollama default)"
+    vram_allocated_gb: 0  # runs on CPU — kv-cache i RAM
+    engine: "ollama"
+    endpoint: "http://localhost:11434"
+
+  embeddings:
+    name: "bge-m3:latest"
+    vram_allocated_gb: 1.2
+    engine: "ollama"
+    endpoint: "http://localhost:11434"
+
+# VRAM-allokeringar (RTX 3090 24 GB GDDR6X)
+gpu_allocations:
+  - component: "qwen-coder-32b"
+    allocated_gb: 19.0
+    min_gb: 17.0
+    max_gb: 20.0
+  - component: "embeddings"
+    allocated_gb: 3.0
+    min_gb: 2.0
+    max_gb: 4.0
+  - component: "overhead-slack"
+    allocated_gb: 2.0
+    min_gb: 1.0
+    max_gb: 2.5
+
+# System-RAM-allokeringar (64 GB DDR4 — KV-cache offloadas hit)
+ram_allocations:
+  - component: "kv-cache"
+    allocated_gb: 50.0
+    min_gb: 40.0
+    max_gb: 55.0
+    note: "KV-cache offloadad till system-RAM via llama.cpp --no-kv-offload"
+
+oom_prevention:
+  critical_threshold_pct: 5    # freeze agents, flush KV cache
+  high_threshold_pct: 10       # trim context window by 50%
+  moderate_threshold_pct: 20   # defer non-critical allocations
+
+agent_defaults:
+  memory_limit_mb: 512
+  cpu_limit: 1.0
+  base_image_python: "python:3.11-slim"
+  base_image_node: "node:20-slim"
+  base_image_go: "golang:1.22-alpine"
+
+agent_ranks:
+  level_0:
+    tools: ["read_file", "write_file", "terminal", "search_files"]
+    max_tasks: 0  # cannot execute tasks
+
+  b_rank:
+    min_tasks: 5
+    min_success_rate: 0.8
+    tools: ["read_file", "write_file", "terminal", "search_files", "patch"]
+
+  a_rank:
+    min_tasks: 20
+    min_success_rate: 0.9
+    tools: ["*"]  # full tool access
+
+data:
+  dir: "data"
+  agents_file: "agents.json"
+  tasks_file: "tasks.json"
+  event_log_file: "events.jsonl"
+
+inference:
+  ollama_endpoint: "http://localhost:11434"
+  main_model: "qwen2.5-coder:32b"
+  router_model: "llama3.1:8b"
+  embeddings_model: "bge-m3:latest"
+  context_length: 65536  # 64k tokens
+  kv_cache_ram_gb: 50.0

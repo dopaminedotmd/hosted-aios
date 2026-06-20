@@ -1,0 +1,16 @@
+[
+  {
+    "agent_id": "agent-python-001",
+    "name": "initial-python-agent",
+    "rank": "level_0",
+    "status": "idle",
+    "language": "python",
+    "container_id": null,
+    "spawned_at": "2026-06-20T01:35:52.968702",
+    "promoted_at": null,
+    "tasks_completed": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "success_rate": 0.0
+  }
+]
