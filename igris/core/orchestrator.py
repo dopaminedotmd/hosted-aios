@@ -232,6 +232,7 @@ class IgrisOrchestrator:
         if agent.status != AgentStatus.IDLE:
             return None
         agent.status = AgentStatus.TRAINING
+        agent._training_loop = self.loop_count
         focus = decision.get("focus", "general")
         self._log("provision", f"Agent {agent_id} → TRAINING (focus: {focus})")
         return None
@@ -418,12 +419,16 @@ class IgrisOrchestrator:
         return decision
 
     def _print_chat_result(self, decision: dict) -> None:
+        action = decision.get("action", "")
+        if action == "train":
+            print(f"    {C.BOLD}UTFÖR:{C.RESET} {C.YELLOW}→ TRÄNING{C.RESET}")
+            return
         envelope = self.provision(decision)
         if envelope:
             success = self.deploy(envelope)
             icon = f"{C.GREEN}✓ OK{C.RESET}" if success else f"{C.RED}✗ FAIL{C.RESET}"
             print(f"    {C.BOLD}UTFÖR:{C.RESET} {icon}")
-        elif decision.get("action") != "noop":
+        elif action != "noop":
             print(f"    {C.RED}BLOCKERAD — kunde inte provisioneras{C.RESET}")
 
     def _print_chat_full_status(self) -> None:
@@ -476,6 +481,15 @@ class IgrisOrchestrator:
 
         try:
             while True:
+                # Auto-revert TRAINING agents after 3 loops
+                for agent in self.agents.values():
+                    if agent.status == AgentStatus.TRAINING:
+                        if hasattr(agent, '_training_loop') and self.loop_count - agent._training_loop >= 3:
+                            agent.status = AgentStatus.IDLE
+                            agent.tasks_completed += 1
+                            agent.success_rate = min(1.0, agent.success_rate + 0.05)
+                            self._log("chat", f"{agent.agent_id} training complete → IDLE")
+
                 self.loop_count += 1
                 self._print_chat_observe()
                 decision = self._print_chat_decision()
