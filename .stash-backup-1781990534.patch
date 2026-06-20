@@ -1,0 +1,33 @@
+diff --git a/server/setup-cron.sh b/server/setup-cron.sh
+index 60f56c1..ddac433 100644
+--- a/server/setup-cron.sh
++++ b/server/setup-cron.sh
+@@ -62,11 +62,11 @@ install_windows_task() {
+   task_cmd="$bash_win"
+   task_args="-lc \"cd '$root_unix' && bash server/sync.sh >> shared/memory/sync-log.md 2>&1\""
+ 
+-  if schtasks.exe /Query /TN "$TASK_NAME" >/dev/null 2>&1; then
+-    schtasks.exe /Delete /TN "$TASK_NAME" /F >/dev/null
++  if MSYS_NO_PATHCONV=1 schtasks.exe /Query /TN "$TASK_NAME" >/dev/null 2>&1; then
++    MSYS_NO_PATHCONV=1 schtasks.exe /Delete /TN "$TASK_NAME" /F >/dev/null
+   fi
+ 
+-  schtasks.exe /Create /TN "$TASK_NAME" /SC MINUTE /MO 5 /F /TR "\"$task_cmd\" $task_args"
++  MSYS_NO_PATHCONV=1 schtasks.exe /Create /TN "$TASK_NAME" /SC MINUTE /MO 5 /F /TR "\"$task_cmd\" $task_args"
+ 
+   printf 'Installed Windows Task Scheduler job.\n'
+   printf 'Task name: %s\n' "$TASK_NAME"
+diff --git a/shared/memory/sync-log.md b/shared/memory/sync-log.md
+index 1bd4715..5894ad8 100644
+--- a/shared/memory/sync-log.md
++++ b/shared/memory/sync-log.md
+@@ -7,3 +7,9 @@
+ #### 2026-06-20 23:22:00
+ - POP: OK
+ 
++#### 2026-06-20 23:22:00
++- COMMIT: "sync: auto-commit 2026-06-20_232200" (2 filer)
++
++#### 2026-06-20 23:22:03
++- PUSH: OK
++
