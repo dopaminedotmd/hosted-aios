@@ -10,7 +10,7 @@
 set -euo pipefail
 
 REMOTE="origin"
-BRANCH="main"
+BRANCH="master"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 

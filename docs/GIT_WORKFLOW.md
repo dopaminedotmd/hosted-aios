@@ -1,27 +1,27 @@
 # Git Workflow — Commander Igris
 
-> Gäller ALLA utvecklare. Ingen pushar direkt till main. Någonsin.
+> Gäller ALLA utvecklare. Ingen pushar direkt till master. Någonsin.
 
 ---
 
 ## 1. Huvudregel
 
-**Main är skyddad.** Alla ändringar går via branch → PR → merge.
+**Master är skyddad.** Alla ändringar går via branch → PR → merge.
 
 ```
-Din branch → PR → Godkännande → Merge till main → Klart
+Din branch → PR → Godkännande → Merge till master → Klart
 ```
 
-Branch protection på GitHub blockerar alla direkta pushar till main. Det går inte att kringgå.
+Branch protection på GitHub blockerar alla direkta pushar till master. Det går inte att kringgå.
 
 ---
 
 ## 2. Dagligt arbete
 
 ```bash
-# 1. Börja med ren main
-git checkout main
-git pull origin main
+# 1. Börja med ren master
+git checkout master
+git pull origin master
 
 # 2. Skapa feature-branch
 git checkout -b dittnamn/vad-du-gor
@@ -88,18 +88,18 @@ Cron-exempel:
 
 **Inställning (görs en gång):**
 ```
-Repo → Settings → Branches → Add rule → "main":
+Repo → Settings → Branches → Add rule → "master":
   ☑ Require a pull request before merging
   ☑ Require approvals (1)
 ```
 
-Efter detta kan ingen — varken människa eller script — pusha direkt till main.
+Efter detta kan ingen — varken människa eller script — pusha direkt till master.
 
 ---
 
 ## 7. Checklista för ny utvecklare
 
-- [ ] Klona repot: `git clone git@github.com:Alpedal/the-system.git`
+- [ ] Klona repot: `git clone git@github.com:dopaminedotmd/hosted-aios.git`
 - [ ] Läs denna fil
 - [ ] Skapa din första branch: `git checkout -b dittnamn/test`
 - [ ] Gör en liten ändring, pusha, öppna PR
