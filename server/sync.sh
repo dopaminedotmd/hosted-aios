@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && (pwd -W 2>/dev/null || pwd))"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && (pwd -W 2>/dev/null || pwd))"
 LOG_FILE="$ROOT_DIR/shared/memory/sync-log.md"
 ALERT_FILE="$ROOT_DIR/.hermes-alert"
-REMOTE_BRANCH="${SYNC_BRANCH:-master}"
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'main')"
+REMOTE_BRANCH="${SYNC_BRANCH:-$CURRENT_BRANCH}"
+
 
 FORBIDDEN_PATTERNS=(
   'git push --force'
