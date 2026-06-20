@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Igris — Solo System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060c;
+    --panel: #0a0a16;
+    --border: rgba(99,102,241,0.15);
+    --border-active: rgba(99,102,241,0.4);
+    --system-blue: #6366f1;
+    --system-violet: #8b5cf6;
+    --system-cyan: #3b82f6;
+    --gold: #f59e0b;
+    --text: #e3e3e4;
+    --text-dim: #71718a;
+    --green: #44ff44;
+    --red: #ef4444;
+    --radius: 2px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex; align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .topbar h1 {
+    font-size: 16px; font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--system-blue);
+  }
+  .topbar .sep {
+    width: 1px; height: 16px;
+    background: var(--border);
+  }
+  .topbar .status-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.2);
+    color: var(--system-blue);
+    padding: 3px 8px;
+    border-radius: var(--radius);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Main grid */
+  .main-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: 1fr;
+    gap: 1px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  /* Chat zone */
+  .chat-zone {
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto;
+    padding: 24px;
+    display: flex; flex-direction: column;
+    gap: 16px;
+  }
+  .sys-msg {
+    animation: sysIn 0.3s ease;
+    max-width: 600px;
+  }
+  @keyframes sysIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .sys-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .sys-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: var(--radius);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sys-badge.system { background: rgba(99,102,241,0.12); color: var(--system-blue); border: 1px solid rgba(99,102,241,0.2); }
+  .sys-badge.agent { background: rgba(245,158,11,0.1); color: var(--gold); border: 1px solid rgba(245,158,11,0.2); }
+  .sys-badge.user { background: rgba(59,130,246,0.1); color: var(--system-cyan); border: 1px solid rgba(59,130,246,0.2); }
+  .sys-badge.success { background: rgba(68,255,68,0.08); color: var(--green); border: 1px solid rgba(68,255,68,0.15); }
+  .sys-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: #555;
+  }
+  .sys-body {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px; line-height: 1.7;
+    color: var(--text);
+  }
+  .sys-body.user-msg {
+    border-color: rgba(99,102,241,0.25);
+    background: rgba(99,102,241,0.04);
+  }
+  .sys-body code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: var(--radius);
+    color: var(--system-cyan);
+  }
+  .sys-body .highlight { color: var(--system-blue); font-weight: 500; }
+  .sys-body .stat-line {
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(99,102,241,0.06);
+    color: var(--text-dim);
+  }
+  .sys-body .stat-line span:last-child { color: var(--system-blue); }
+
+  .chat-input-wrap {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .chat-input-row {
+    display: flex; gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    transition: border-color 0.2s;
+  }
+  .chat-input-row:focus-within {
+    border-color: var(--border-active);
+    box-shadow: 0 0 20px rgba(99,102,241,0.06);
+  }
+  .chat-input-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+  }
+  .chat-input-row input::placeholder { color: #3a3a4a; }
+  .chat-input-row button {
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.2);
+    color: var(--system-blue);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: background 0.15s;
+  }
+  .chat-input-row button:hover { background: rgba(99,102,241,0.2); }
+
+  /* Side panel */
+  .side-panel {
+    background: #080810;
+    border-left: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+    gap: 1px;
+  }
+  .side-section {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .side-section-header {
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--system-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center;
+  }
+  .side-section-body {
+    padding: 10px 16px;
+  }
+
+  /* Stat block */
+  .stat-block {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .stat-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(99,102,241,0.04);
+    color: var(--text-dim);
+  }
+  .stat-row .stat-val { color: var(--text); font-weight: 500; }
+  .stat-row .stat-up { color: var(--green); }
+  .stat-row .stat-down { color: var(--red); }
+
+  /* Quest log */
+  .quest-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(99,102,241,0.05);
+  }
+  .quest-title {
+    font-size: 12px; font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .quest-title .quest-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    padding: 1px 5px;
+    border-radius: var(--radius);
+    margin-right: 6px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .quest-tag.urgent { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .quest-tag.daily { background: rgba(59,130,246,0.1); color: var(--system-cyan); border: 1px solid rgba(59,130,246,0.2); }
+  .quest-tag.active { background: rgba(68,255,68,0.08); color: var(--green); border: 1px solid rgba(68,255,68,0.15); }
+  .quest-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: #555;
+  }
+
+  /* Agent list */
+  .agent-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(99,102,241,0.04);
+    cursor: pointer;
+  }
+  .agent-rank {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    border-radius: var(--radius);
+    flex-shrink: 0;
+  }
+  .agent-rank.S { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+  .agent-rank.A { background: rgba(139,92,246,0.1); color: var(--system-violet); border: 1px solid rgba(139,92,246,0.2); }
+  .agent-rank.B { background: rgba(99,102,241,0.08); color: var(--system-blue); border: 1px solid rgba(99,102,241,0.15); }
+  .agent-info { min-width: 0; }
+  .agent-name { font-size: 12px; font-weight: 500; }
+  .agent-role { font-size: 10px; color: var(--text-dim); }
+  .agent-status-dot {
+    width: 5px; height: 5px;
+    border-radius: 1px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .dot-active { background: var(--green); box-shadow: 0 0 6px rgba(68,255,68,0.3); }
+  .dot-idle { background: var(--gold); }
+  .dot-blocked { background: var(--red); }
+
+  /* GPU bar */
+  .gpu-stat {
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    margin-bottom: 4px;
+    color: var(--text-dim);
+  }
+  .gpu-bar {
+    height: 3px;
+    background: rgba(99,102,241,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .gpu-fill {
+    height: 100%;
+    background: var(--system-blue);
+    border-radius: 2px;
+    width: 79%;
+    transition: width 0.6s;
+  }
+
+  @media (max-width: 768px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .side-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>[ SYSTEM ]</h1>
+  <div class="sep"></div>
+  <span class="status-tag">ONLINE</span>
+  <div class="sep"></div>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#555;">RTX 3090 · qwen2.5-coder:32b</span>
+</div>
+
+<div class="main-grid">
+
+  <!-- CHAT -->
+  <div class="chat-zone">
+    <div class="chat-messages" id="msgs">
+      <div class="sys-msg">
+        <div class="sys-header">
+          <span class="sys-badge system">SYSTEM</span>
+          <span class="sys-time">14:32:01</span>
+        </div>
+        <div class="sys-body">
+          <span class="highlight">[ Systemaktivering ]</span><br>
+          Igris-kärnan har startat. Alla 5 agenter är synkroniserade.<br>
+          Model: <code>qwen2.5-coder:32b</code> · VRAM: 19.2/24 GB<br>
+          Status: <span style="color:#44ff44;">REDO</span>
+        </div>
+      </div>
+
+      <div class="sys-msg">
+        <div class="sys-header">
+          <span class="sys-badge system">SYSTEM</span>
+          <span class="sys-time">14:32:04</span>
+        </div>
+        <div class="sys-body">
+          <span class="highlight">[ Daglig Quest ]</span><br>
+          Genomför 3 koduppgifter · Belöning: +15 EXP<br>
+          Status: <span style="color:#f59e0b;">0/3</span>
+        </div>
+      </div>
+
+      <div class="sys-msg">
+        <div class="sys-header">
+          <span class="sys-badge user">ANVÄNDARE</span>
+          <span class="sys-time">14:32:15</span>
+        </div>
+        <div class="sys-body user-msg">
+          Bygg en login-sida i React med Tailwind.
+        </div>
+      </div>
+
+      <div class="sys-msg">
+        <div class="sys-header">
+          <span class="sys-badge agent">IGRIS</span>
+          <span class="sys-time">14:32:18</span>
+        </div>
+        <div class="sys-body">
+          <span class="highlight">[ Delegering ]</span><br>
+          Research → <code>Gemini</code> (Rank A)<br>
+          Implementation → <code>Claude Code</code> (Rank A)<br>
+          <br>
+          <div class="stat-line"><span>Uppskattad tid</span><span>~45s</span></div>
+          <div class="stat-line"><span>Kö-position</span><span>1/1</span></div>
+          <div class="stat-line"><span>Prioritet</span><span>NORMAL</span></div>
+        </div>
+      </div>
+
+      <div class="sys-msg">
+        <div class="sys-header">
+          <span class="sys-badge success">GENOMFÖRT</span>
+          <span class="sys-time">14:33:42</span>
+        </div>
+        <div class="sys-body">
+          <span class="highlight">[ Quest: Login-sida ]</span><br>
+          Claude Code har genererat <code>login.tsx</code>.<br>
+          Hermes auditar... <span style="color:#f59e0b;">1 issue hittad</span> — returneras för revision.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-wrap">
+      <div class="chat-input-row">
+        <input type="text" placeholder="Ange kommando..." id="chatIn">
+        <button onclick="send()">EXECUTE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel">
+
+    <!-- Player Stats -->
+    <div class="side-section">
+      <div class="side-section-header">
+        <span>◆ Spelare: William</span>
+        <span style="color:var(--gold);">LV. 23</span>
+      </div>
+      <div class="side-section-body">
+        <div class="stat-block">
+          <div class="stat-row"><span>STR</span><span class="stat-val">85</span><span class="stat-up">▲2</span></div>
+          <div class="stat-row"><span>AGI</span><span class="stat-val">72</span><span class="stat-up">▲1</span></div>
+          <div class="stat-row"><span>INT</span><span class="stat-val">91</span><span class="stat-down">▼1</span></div>
+          <div class="stat-row"><span>PER</span><span class="stat-val">78</span></div>
+          <div class="stat-row" style="border:none;margin-top:8px;">
+            <span>EXP</span>
+            <span class="stat-val" style="color:var(--system-blue);">2,340 / 5,000</span>
+          </div>
+          <div class="gpu-bar" style="margin-top:4px;">
+            <div class="gpu-fill" style="width:47%;background:var(--system-violet);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quests -->
+    <div class="side-section">
+      <div class="side-section-header">
+        <span>◆ Quest-logg</span>
+        <span style="color:var(--text-dim);font-size:9px;">3 aktiva</span>
+      </div>
+      <div class="side-section-body">
+        <div class="quest-item">
+          <div class="quest-title"><span class="quest-tag urgent">URGENT</span>Bygg login-sida</div>
+          <div class="quest-meta">Belöning: +25 EXP · Status: Pågår</div>
+        </div>
+        <div class="quest-item">
+          <div class="quest-title"><span class="quest-tag active">DAILY</span>3 koduppgifter</div>
+          <div class="quest-meta">Belöning: +15 EXP · Status: 0/3</div>
+        </div>
+        <div class="quest-item">
+          <div class="quest-title"><span class="quest-tag daily">WEEKLY</span>Deploya Igris API</div>
+          <div class="quest-meta">Belöning: +50 EXP · Status: Väntar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agents -->
+    <div class="side-section">
+      <div class="side-section-header">
+        <span>◆ Shadow Army</span>
+        <span style="color:var(--text-dim);font-size:9px;">5/5</span>
+      </div>
+      <div class="side-section-body">
+        <div class="agent-row">
+          <div class="agent-rank S">S</div>
+          <div class="agent-info">
+            <div class="agent-name">Igris</div>
+            <div class="agent-role">Commander</div>
+          </div>
+          <div class="agent-status-dot dot-active"></div>
+        </div>
+        <div class="agent-row">
+          <div class="agent-rank A">A</div>
+          <div class="agent-info">
+            <div class="agent-name">Gemini</div>
+            <div class="agent-role">Research</div>
+          </div>
+          <div class="agent-status-dot dot-idle"></div>
+        </div>
+        <div class="agent-row">
+          <div class="agent-rank A">A</div>
+          <div class="agent-info">
+            <div class="agent-name">Claude Code</div>
+            <div class="agent-role">Implementation</div>
+          </div>
+          <div class="agent-status-dot dot-idle"></div>
+        </div>
+        <div class="agent-row">
+          <div class="agent-rank B">B</div>
+          <div class="agent-info">
+            <div class="agent-name">Hermes</div>
+            <div class="agent-role">Audit</div>
+          </div>
+          <div class="agent-status-dot dot-blocked"></div>
+        </div>
+        <div class="agent-row">
+          <div class="agent-rank B">B</div>
+          <div class="agent-info">
+            <div class="agent-name">Antigravity</div>
+            <div class="agent-role">Orchestrator</div>
+          </div>
+          <div class="agent-status-dot dot-idle"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GPU -->
+    <div class="side-section">
+      <div class="side-section-header">
+        <span>◆ Systemresurser</span>
+      </div>
+      <div class="side-section-body">
+        <div class="gpu-stat"><span>VRAM</span><span>19.2 / 24 GB</span></div>
+        <div class="gpu-bar"><div class="gpu-fill"></div></div>
+        <div class="gpu-stat" style="margin-top:8px;"><span>GPU Temp</span><span>67°C</span></div>
+        <div class="gpu-stat"><span>GPU Load</span><span>82%</span></div>
+        <div class="gpu-stat"><span>Uptime</span><span>4h 22m</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function send() {
+    const input = document.getElementById('chatIn');
+    const text = input.value.trim();
+    if (!text) return;
+    const container = document.getElementById('msgs');
+    const now = new Date().toTimeString().slice(0,8);
+    const div = document.createElement('div');
+    div.className = 'sys-msg';
+    div.innerHTML = '<div class="sys-header"><span class="sys-badge user">ANVÄNDARE</span><span class="sys-time">'+now+'</span></div><div class="sys-body user-msg">'+text+'</div>';
+    container.appendChild(div);
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+  }
+  document.getElementById('chatIn').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') send();
+  });
+</script>
+</body>
+</html>
