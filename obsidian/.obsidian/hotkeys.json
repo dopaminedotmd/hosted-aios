@@ -1,0 +1,11 @@
+{
+  "obsidian.md:daily-note": [
+    {"modifiers": ["Mod"], "key": "D"}
+  ],
+  "obsidian.md:quick-switcher": [
+    {"modifiers": ["Mod"], "key": "O"}
+  ],
+  "obsidian.md:command-palette": [
+    {"modifiers": ["Mod"], "key": "P"}
+  ]
+}

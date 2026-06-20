@@ -1,0 +1,14 @@
+{
+  "promptDelete": false,
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "01-planning",
+  "attachmentFolderPath": "assets",
+  "showUnsupportedFiles": false,
+  "showLineNumber": true,
+  "readableLineLength": false,
+  "strictLineBreaks": false,
+  "spellcheck": true,
+  "autoConvertHtml": true,
+  "vimMode": false
+}

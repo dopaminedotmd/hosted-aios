@@ -1,0 +1,42 @@
+# Hemliga nycklar — synkas ALDRIG
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Beroenden
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Byggfiler
+.next/
+dist/
+build/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Hermes interna
+/.hermes/plans/
+
+# Obsidian workspace (inte vault-konfig)
+obsidian/.obsidian/workspace.json
+obsidian/.obsidian/workspace-mobile.json
+
+# Docker
+docker-data/
