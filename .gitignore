@@ -4,6 +4,8 @@ __pycache__/
 *.pyo
 .pytest_cache/
 *.bak
+.venv/
+*.venv/
 
 # External git repos (embedded — don't track)
 external/
