@@ -3,7 +3,9 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && (pwd -W 2>/dev/null || pwd))"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && (pwd -W 2>/dev/null || pwd))"
-LOG_FILE="$ROOT_DIR/shared/memory/sync-log.md"
+GIT_USER="$(git config user.name 2>/dev/null | tr -d ' ' | tr '[:upper:]' '[:lower:]')"
+LOG_FILE="$ROOT_DIR/shared/memory/sync-log-${GIT_USER:-local}.md"
+TEMP_LOG="$ROOT_DIR/.sync-log-temp.md"
 ALERT_FILE="$ROOT_DIR/.hermes-alert"
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'main')"
 REMOTE_BRANCH="${SYNC_BRANCH:-$CURRENT_BRANCH}"
@@ -61,7 +63,14 @@ log_block() {
       printf '%s\n' "$line"
     done
     printf '\n'
-  } >> "$LOG_FILE"
+  } >> "$TEMP_LOG"
+}
+
+flush_temp_log() {
+  if [[ -f "$TEMP_LOG" ]]; then
+    cat "$TEMP_LOG" >> "$LOG_FILE"
+    rm -f "$TEMP_LOG"
+  fi
 }
 
 count_lines() {
@@ -139,6 +148,7 @@ handle_pull_conflict() {
 }
 
 main() {
+  rm -f "$TEMP_LOG"
   cd "$ROOT_DIR"
   ensure_repo
   ensure_log_dir
@@ -195,6 +205,8 @@ main() {
     log_block "- POP: OK"
   fi
 
+  flush_temp_log
+
   run_checked git_safe add -A
   commit_files="$(count_commit_files)"
 
@@ -211,6 +223,7 @@ main() {
   fi
 
   log_block "- PUSH: OK"
+  flush_temp_log
 }
 
 main "$@"
