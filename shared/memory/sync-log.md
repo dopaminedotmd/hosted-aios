@@ -63,3 +63,17 @@ warning: in the working copy of 'shared/memory/sync-log.md', LF will be replaced
 To https://github.com/dopaminedotmd/hosted-aios.git
    3bc22dd..8476495  main -> main
 warning: in the working copy of 'shared/memory/sync-log-dopaminedotmd.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/core-plugins.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/workspace.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'obsidian/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/community-plugins.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/plugins/omnisearch/data.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/plugins/omnisearch/main.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/plugins/omnisearch/manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/plugins/omnisearch/styles.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/appearance.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/core-plugins.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.obsidian/workspace.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'obsidian/README.md', LF will be replaced by CRLF the next time Git touches it
